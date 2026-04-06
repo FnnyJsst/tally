@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView,
   RefreshControl, TouchableOpacity, SafeAreaView, Image
 } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useAuthStore } from '../../stores/useAuthStore'
 import { useProductStore } from '../../stores/useProductStore'
@@ -13,14 +14,14 @@ import { useTheme } from '../../contexts/ThemeContext'
 import AuroraBackground from '../../components/AuroraBackground'
 import StatCard from '../../components/StatCard'
 import AlertRow from '../../components/AlertRow'
-import ActivityRow from '../../components/ActivityRow'
+import StockFlowCard from '../../components/StockFlowCard'
 import { Spacing, FontSize, Radius, FontFamily, type ColorScheme } from '../../constants/theme'
 
 export default function DashboardScreen() {
   const router = useRouter()
   const { user } = useAuthStore()
   const { products, fetchProducts, isLoading: loadingProducts } = useProductStore()
-  const { entries, fetchEntries, isLoading: loadingEntries } = useStockStore()
+  const { fetchEntries, isLoading: loadingEntries } = useStockStore()
   const { channels, fetchChannels } = useChannelStore()
   const { alertsEnabled } = useAlertPrefs()
   const { colors, isDark } = useTheme()
@@ -42,7 +43,6 @@ export default function DashboardScreen() {
     (p) => (p.totalStock ?? 0) <= 0
   )
 
-  const recentEntries = entries.slice(0, 5)
   const isRefreshing = loadingProducts || loadingEntries
 
   const firstName = user?.shopName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'toi'
@@ -60,26 +60,40 @@ export default function DashboardScreen() {
         >
           {/* Header */}
           <View style={styles.header}>
-            <View>
-              <Text style={styles.greeting}>
-                Bonjour 👋 {' '}
-              </Text>
-              <Text style={styles.greetingName}>{firstName}</Text>
+            <View style={styles.headerLeft}>
+              <TouchableOpacity
+                style={styles.avatarWrapper}
+                onPress={() => router.push('/(tabs)/settings/profile' as any)}
+                activeOpacity={0.8}
+              >
+                {user?.photo_url ? (
+                  <Image source={{ uri: user.photo_url }} style={styles.avatarImage} />
+                ) : (
+                  <>
+                    <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.accent, borderRadius: 99 }]} />
+                    <Text style={styles.avatarText}>
+                      {(user?.shopName?.[0] ?? user?.email?.[0] ?? 'T').toUpperCase()}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+              <View>
+                <Text style={styles.greeting}>Bonjour 👋</Text>
+                <Text style={styles.greetingName}>{firstName}</Text>
+              </View>
             </View>
             <TouchableOpacity
-              style={styles.avatarWrapper}
-              onPress={() => router.push('/(tabs)/settings/profile' as any)}
+              style={styles.notifBtn}
+              onPress={() => router.push('/(tabs)/stock' as any)}
               activeOpacity={0.8}
             >
-              {user?.photo_url ? (
-                <Image source={{ uri: user.photo_url }} style={styles.avatarImage} />
-              ) : (
-                <View style={[StyleSheet.absoluteFillObject, { backgroundColor: colors.accent, borderRadius: 99 }]} />
-              )}
-              {!user?.photo_url && (
-                <Text style={styles.avatarText}>
-                  {(user?.shopName?.[0] ?? user?.email?.[0] ?? 'T').toUpperCase()}
-                </Text>
+              <Ionicons name="notifications-outline" size={22} color={colors.text} />
+              {alertProducts.length > 0 && (
+                <View style={styles.notifBadge}>
+                  <Text style={styles.notifBadgeText}>
+                    {alertProducts.length > 9 ? '9+' : alertProducts.length}
+                  </Text>
+                </View>
               )}
             </TouchableOpacity>
           </View>
@@ -147,30 +161,14 @@ export default function DashboardScreen() {
             </View>
           )}
 
-          {/* Activité récente */}
-          <View style={styles.card}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionLabel}>Activité récente</Text>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/stock' as any)}>
-                <Text style={styles.sectionLink}>Voir tout</Text>
-              </TouchableOpacity>
-            </View>
-            {recentEntries.length === 0 ? (
-              <Text style={styles.empty}>Aucun mouvement pour l'instant</Text>
-            ) : (
-              recentEntries.map((entry) => (
-                <ActivityRow
-                  key={entry.id}
-                  productName={(entry as any).variants?.products?.name ?? 'Produit inconnu'}
-                  quantity={entry.quantity}
-                  type={entry.type}
-                  channelName={(entry as any).channels?.name ?? '—'}
-                  date={entry.occurredAt}
-                  note={(entry as any).note}
-                />
-              ))
-            )}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>Activité récente</Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/stock' as any)}>
+               <Text style={styles.sectionLink}>Voir tout  →</Text>
+            </TouchableOpacity>
           </View>
+
+          <StockFlowCard />
 
           <TouchableOpacity
             style={styles.statsBtn}
@@ -226,12 +224,38 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
       marginTop: -4,
     },
     syncLabel: { fontSize: FontSize.sm, color: colors.text3, marginTop: 4 },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
     avatarWrapper: {
-      width: 40, height: 40, borderRadius: 99,
+      width: 44, height: 44, borderRadius: 99,
       alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
     },
     avatarImage: { width: '100%', height: '100%' },
     avatarText: { color: '#FFF', fontSize: FontSize.base, fontWeight: '600' },
+    notifBtn: {
+      width: 40, height: 40, borderRadius: 99,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    notifBadge: {
+      position: 'absolute',
+      top: -2, right: -2,
+      minWidth: 16, height: 16,
+      borderRadius: 8,
+      backgroundColor: colors.red,
+      alignItems: 'center', justifyContent: 'center',
+      paddingHorizontal: 3,
+    },
+    notifBadgeText: {
+      fontSize: 9,
+      fontWeight: '700',
+      color: '#FFF',
+    },
     bentoGrid: { gap: Spacing.md },
     bentoRow: { flexDirection: 'row', gap: Spacing.md },
     bentoCol: { flex: 1, gap: Spacing.md },
@@ -243,7 +267,14 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
       padding: Spacing.lg,
       gap: Spacing.md,
     },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    sectionHeader: { 
+      flexDirection: 'row', 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+      padding: 0, 
+      margin: 0
+    },
+    
     sectionLabel: {
       fontSize: FontSize.xs, fontWeight: '600', letterSpacing: 0.8,
       textTransform: 'uppercase', color: colors.text3,

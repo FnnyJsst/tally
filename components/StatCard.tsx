@@ -54,8 +54,6 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
     card: {
       backgroundColor: colors.surface,
       borderRadius: Radius.lg,
-      // borderWidth: 1,
-      // borderColor: colors.border,
       padding: Spacing.md,
       flex: 1,
       gap: Spacing.sm,
@@ -105,6 +103,7 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
       color: colors.text,
       lineHeight: 36,
       marginTop: Spacing.xs,
+      fontWeight: '700',
     },
     valueDark: {
       color: '#FFFFFF',

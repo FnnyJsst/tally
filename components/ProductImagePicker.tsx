@@ -32,8 +32,8 @@ export default function ProductImagePicker({ value, onChange, size = 120 }: Prop
 
   const pickImage = async () => {
     Alert.alert('Ajouter une photo', 'Choisis une source', [
-      { text: 'Galerie', onPress: () => launchPicker('library') },
-      { text: 'Appareil photo', onPress: () => launchPicker('camera') },
+      { text: 'Galerie', onPress: () => setTimeout(() => launchPicker('library'), 300) },
+      { text: 'Appareil photo', onPress: () => setTimeout(() => launchPicker('camera'), 300) },
       { text: 'Annuler', style: 'cancel' },
     ])
   }

@@ -58,7 +58,7 @@ export default function NewProductScreen() {
         .select()
         .single()
 
-      if (productError || !product) throw new Error(productError?.message)
+      if (productError || !product) throw new Error(productError?.message ?? 'Impossible de créer le produit.')
 
       const variantNames = hasVariants
         ? variants.filter(v => v.name.trim())
@@ -73,7 +73,7 @@ export default function NewProductScreen() {
         })))
         .select()
 
-      if (variantError) throw new Error(variantError.message)
+      if (variantError) throw new Error(variantError.message ?? 'Impossible de créer les variantes.')
 
       const stock = parseInt(initialStock) || 0
       if (stock > 0 && createdVariants && createdVariants.length > 0) {
@@ -92,7 +92,8 @@ export default function NewProductScreen() {
       await fetchProducts()
       router.back()
     } catch (e: any) {
-      Alert.alert('Erreur', e.message ?? 'Une erreur est survenue.')
+      const msg = typeof e?.message === 'string' && e.message ? e.message : 'Une erreur est survenue.'
+      Alert.alert('Erreur', msg)
     } finally {
       setIsLoading(false)
     }
