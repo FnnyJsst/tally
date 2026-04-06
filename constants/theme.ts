@@ -10,13 +10,13 @@ export const lightColors = {
   text3:       '#9E9AAE',
   accent:      '#FF8D50',
   accentLight: '#EEE8F8',
-  green:       '#3A7A5A',
-  greenBg:     '#E8F5EE',
+  green:       'rgba(59, 172, 138, 0.85)',
+  greenBg:     'rgba(226, 245, 239, 0.85)',
   greenBorder: 'rgba(58,122,90,0.2)',
-  red:         '#C4503A',
-  redBg:       '#FDE8E0',
+  red:         'rgba(245, 73, 70, 0.85)',
+  redBg:       'rgba(245, 229, 229, 0.85)',
   redBorder:   'rgba(196,80,58,0.2)',
-  orange:      '#B07A10',
+  orange:      '#e6a21a',
   orangeBg:    '#FEF3D0',
   orangeBorder:'rgba(176,122,16,0.2)',
   pill:        'rgba(0,0,0,0.06)',
@@ -81,9 +81,9 @@ export const FontSize = {
   display: 32,
 }
 
-// Open Sans font family names (loaded via @expo-google-fonts/open-sans)
+// Fraunces font family names (loaded via @expo-google-fonts/fraunces)
 export const FontFamily = {
-  display: 'OpenSans_400Regular',
-  displayBold: 'OpenSans_700Bold',
-  displayItalic: 'OpenSans_400Regular_Italic',
+  display: 'Open_400Regular',
+  displayBold: 'Fraunces_700Bold',
+  displayItalic: 'Fraunces_400Regular_Italic',
 }

@@ -5,19 +5,12 @@ import {
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
-import * as FileSystem from 'expo-file-system'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/useAuthStore'
 import { useTheme } from '../contexts/ThemeContext'
 import { Spacing, FontSize } from '../constants/theme'
 
-function decode(base64: string): Uint8Array {
-  const binary = atob(base64)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-  return bytes
-}
 
 type Props = {
   value?: string | null
@@ -66,18 +59,18 @@ export default function ProductImagePicker({ value, onChange, size = 120 }: Prop
       const manipulated = await ImageManipulator.manipulateAsync(
         uri,
         [{ resize: { width: 800, height: 800 } }],
-        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true }
       )
 
-      const base64 = await FileSystem.readAsStringAsync(manipulated.uri, {
-        encoding: 'base64' as any,
-      })
+      const binary = atob(manipulated.base64!)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
 
       const fileName = `${user?.id}/${Date.now()}.jpg`
 
       const { error } = await supabase.storage
         .from('product-photo')
-        .upload(fileName, decode(base64), { contentType: 'image/jpeg', upsert: true })
+        .upload(fileName, bytes, { contentType: 'image/jpeg', upsert: true })
 
       if (error) throw new Error(error.message)
 

@@ -8,7 +8,6 @@ import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
-import * as FileSystem from 'expo-file-system'
 import { useAuthStore } from '../../../stores/useAuthStore'
 import { useTheme } from '../../../contexts/ThemeContext'
 import { supabase } from '../../../lib/supabase'
@@ -57,12 +56,9 @@ export default function EditProfileScreen() {
       const manipulated = await ImageManipulator.manipulateAsync(
         result.assets[0].uri,
         [{ resize: { width: 400, height: 400 } }],
-        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: true }
       )
-      const base64 = await FileSystem.readAsStringAsync(manipulated.uri, {
-        encoding: 'base64' as any,
-      })
-      const binary = atob(base64)
+      const binary = atob(manipulated.base64!)
       const bytes = new Uint8Array(binary.length)
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
       const fileName = `${user?.id}/avatar_${Date.now()}.jpg`

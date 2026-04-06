@@ -49,6 +49,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
       .eq('id', user.id)
       .single()
 
-    if (data) set({ user: data, isAuthenticated: true })
+    if (data) set({
+      user: {
+        ...data,
+        shopName: data.shop_name,
+        activityType: data.activity_type,
+        createdAt: data.created_at,
+      },
+      isAuthenticated: true,
+    })
   },
 }))

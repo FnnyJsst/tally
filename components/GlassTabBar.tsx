@@ -52,12 +52,6 @@ export default function GlassTabBar({ state, navigation }: BottomTabBarProps) {
             }}
             activeOpacity={0.7}
           >
-            {isFocused && (
-              <View style={[
-                styles.activePill,
-                { backgroundColor: isDark ? 'rgba(155,127,212,0.15)' : colors.accentLight },
-              ]} />
-            )}
             <Ionicons
               name={isFocused ? icons.active : icons.inactive}
               size={22}
@@ -134,7 +128,7 @@ const styles = StyleSheet.create({
   },
   lightOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
   },
   inner: {
     flexDirection: 'row',

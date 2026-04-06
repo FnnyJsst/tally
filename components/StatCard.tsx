@@ -31,7 +31,7 @@ export default function StatCard({
     >
       <View style={styles.topRow}>
         <View style={[styles.iconBubble, { backgroundColor: iconBg }]}>
-          <Ionicons name={icon} size={18} color={iconColor} />
+          <Ionicons name={icon} size={16} color={iconColor} />
         </View>
         <TouchableOpacity
           style={[styles.actionBtn, dark && styles.actionBtnDark]}
@@ -41,7 +41,7 @@ export default function StatCard({
           <Text style={[styles.actionText, dark && styles.actionTextDark]}>{actionLabel}</Text>
         </TouchableOpacity>
       </View>
-      <Text style={[styles.value, dark && styles.valueDark]} adjustsFontSizeToFit numberOfLines={1}>
+      <Text style={[styles.value, dark && styles.valueDark]}>
         {value}
       </Text>
       <Text style={[styles.label, dark && styles.labelDark]}>{label}</Text>
@@ -70,8 +70,8 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
       alignItems: 'center',
     },
     iconBubble: {
-      width: 38,
-      height: 38,
+      width: 36,
+      height: 36,
       borderRadius: Radius.full,
       alignItems: 'center',
       justifyContent: 'center',
@@ -98,12 +98,12 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
     },
     value: {
       fontSize: 32,
-      fontFamily: FontFamily.display,
+      // fontFamily: FontFamily.display,
       letterSpacing: -0.5,
       color: colors.text,
       lineHeight: 36,
       marginTop: Spacing.xs,
-      fontWeight: '700',
+      fontWeight: '300',
     },
     valueDark: {
       color: '#FFFFFF',
@@ -112,6 +112,7 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
       fontSize: FontSize.sm,
       fontWeight: '500',
       color: colors.text3,
+      marginTop: -10
     },
     labelDark: {
       color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.75)',
