@@ -24,22 +24,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ isLoading: true })
     const { data, error } = await supabase
       .from('products')
-      .select(`*, variants(*)`)
+      .select(`*, variants(*, stock_entries(quantity))`)
       .order('created_at', { ascending: false })
 
     if (!error && data) {
-      // Calcul du stock total par produit (somme des mouvements)
-      const withStock = await Promise.all(
-        data.map(async (product) => {
-          const { data: entries } = await supabase
-            .from('stock_entries')
-            .select('quantity, variant_id')
-            .in('variant_id', product.variants?.map((v: Variant) => v.id) ?? [])
-
-          const totalStock = entries?.reduce((sum, e) => sum + e.quantity, 0) ?? 0
-          return { ...product, totalStock }
-        })
-      )
+      const withStock = data.map((product) => {
+        const totalStock = product.variants?.reduce((sum: number, v: any) =>
+          sum + (v.stock_entries?.reduce((s: number, e: any) => s + e.quantity, 0) ?? 0), 0) ?? 0
+        return { ...product, totalStock, photoUrl: product.photo_url }
+      })
       set({ products: withStock })
     }
     set({ isLoading: false })
@@ -52,7 +45,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       .eq('id', id)
       .single()
 
-    if (data) set({ selectedProduct: data })
+    if (data) set({ selectedProduct: { ...data, photoUrl: data.photo_url } })
   },
 
   createProduct: async (data) => {

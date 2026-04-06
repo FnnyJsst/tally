@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,18 +14,29 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.tally.app"
+      "bundleIdentifier": "com.tally.app",
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "Pour t'alerter quand un produit est en stock bas."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#F7F6F3"
       },
       "package": "com.tally.app"
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1A1917"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

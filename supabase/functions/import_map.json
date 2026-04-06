@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "@noble/hashes/hmac": "https://esm.sh/@noble/hashes@1.3.2/hmac",
+    "@noble/hashes/sha1": "https://esm.sh/@noble/hashes@1.3.2/sha1"
+  }
+}

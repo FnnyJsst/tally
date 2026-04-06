@@ -5,6 +5,7 @@ export type User = {
   shopName: string
   activityType: string
   createdAt: string
+  photo_url?: string
 }
 
 // ─── Produits ────────────────────────────────────────────
@@ -35,7 +36,7 @@ export type Variant = {
 }
 
 // ─── Canaux ──────────────────────────────────────────────
-export type ChannelType = 'etsy' | 'woocommerce' | 'physical' | 'market' | 'other'
+export type ChannelType = 'etsy' | 'shopify' | 'woocommerce' | 'physical' | 'market' | 'other'
 
 export type Channel = {
   id: string

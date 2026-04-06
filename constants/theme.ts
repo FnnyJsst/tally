@@ -1,53 +1,89 @@
-export const Colors = {
-  // Backgrounds
-  bg: '#F7F6F3',
-  surface: '#FFFFFF',
-  surface2: '#F0EEE9',
-
-  // Borders
-  border: 'rgba(0,0,0,0.07)',
-
-  // Text
-  text: '#1A1917',
-  text2: '#6B6860',
-  text3: '#A8A49E',
-
-  // Accent
-  accent: '#1A1917',
-
-  // Status
-  green: '#1D6648',
-  greenBg: '#E8F5EE',
-  red: '#B83232',
-  redBg: '#FAEAEA',
-  orange: '#9A4E10',
-  orangeBg: '#FDF0E6',
+// ─── Light (new violet identity) ────────────────────────────────────────────
+export const lightColors = {
+  bg:          '#F4F5F7',
+  surface:     '#FFFFFF',
+  surface2:    '#EDEEF2',
+  border:      'rgba(0,0,0,0.07)',
+  border2:     'rgba(0,0,0,0.04)',
+  text:        '#18161F',
+  text2:       '#5A566A',
+  text3:       '#9E9AAE',
+  accent:      '#FF8D50',
+  accentLight: '#EEE8F8',
+  green:       '#3A7A5A',
+  greenBg:     '#E8F5EE',
+  greenBorder: 'rgba(58,122,90,0.2)',
+  red:         '#C4503A',
+  redBg:       '#FDE8E0',
+  redBorder:   'rgba(196,80,58,0.2)',
+  orange:      '#B07A10',
+  orangeBg:    '#FEF3D0',
+  orangeBorder:'rgba(176,122,16,0.2)',
+  pill:        'rgba(0,0,0,0.06)',
+  pillBorder:  'rgba(0,0,0,0.10)',
 }
 
+// ─── Dark (aurora glassmorphism) ─────────────────────────────────────────────
+export const darkColors = {
+  bg:          '#0D0820',
+  surface:     'rgba(255,255,255,0.07)',
+  surface2:    'rgba(255,255,255,0.04)',
+  border:      'rgba(255,255,255,0.12)',
+  border2:     'rgba(255,255,255,0.06)',
+  text:        'rgba(255,255,255,0.95)',
+  text2:       'rgba(255,255,255,0.55)',
+  text3:       'rgba(255,255,255,0.30)',
+  accent:      '#9B7FD4',
+  accentLight: 'rgba(155,127,212,0.2)',
+  green:       '#50E8A0',
+  greenBg:     'rgba(50,220,150,0.15)',
+  greenBorder: 'rgba(50,220,150,0.2)',
+  red:         '#FF7070',
+  redBg:       'rgba(255,80,80,0.15)',
+  redBorder:   'rgba(255,80,80,0.2)',
+  orange:      '#FFB060',
+  orangeBg:    'rgba(255,160,60,0.15)',
+  orangeBorder:'rgba(255,160,60,0.2)',
+  pill:        'rgba(255,255,255,0.10)',
+  pillBorder:  'rgba(255,255,255,0.15)',
+}
+
+export const Colors = lightColors
+export type ColorScheme = typeof lightColors
+
+export const AuroraGradient = ['#9B7FD4', '#6B5FA0'] as const
+
 export const Radius = {
-  sm: 12,
-  md: 16,
-  lg: 20,
-  xl: 28,
+  sm:   6,
+  md:   12,
+  lg:   16,
+  xl:   24,
   full: 999,
 }
 
 export const Spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
+  xs:  6,
+  sm:  10,
+  md:  16,
+  lg:  20,
+  xl:  28,
+  xxl: 36,
 }
 
 export const FontSize = {
-  xs: 10,
-  sm: 11,
-  md: 12,
-  base: 13,
-  lg: 16,
-  xl: 18,
-  xxl: 22,
-  display: 28,
+  xs:      12,
+  sm:      13,
+  md:      14,
+  base:    15,
+  lg:      18,
+  xl:      20,
+  xxl:     24,
+  display: 32,
+}
+
+// Open Sans font family names (loaded via @expo-google-fonts/open-sans)
+export const FontFamily = {
+  display: 'OpenSans_400Regular',
+  displayBold: 'OpenSans_700Bold',
+  displayItalic: 'OpenSans_400Regular_Italic',
 }
