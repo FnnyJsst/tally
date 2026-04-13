@@ -31,7 +31,15 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const withStock = data.map((product) => {
         const totalStock = product.variants?.reduce((sum: number, v: any) =>
           sum + (v.stock_entries?.reduce((s: number, e: any) => s + e.quantity, 0) ?? 0), 0) ?? 0
-        return { ...product, totalStock, photoUrl: product.photo_url }
+        return {
+          ...product,
+          totalStock,
+          photoUrl: product.photo_url,
+          lowStockThreshold: product.low_stock_threshold,
+          hasVariants: product.has_variants,
+          userId: product.user_id,
+          createdAt: product.created_at,
+        }
       })
       set({ products: withStock })
     }
