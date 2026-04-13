@@ -84,7 +84,7 @@ export default function DashboardScreen() {
             </View>
             <TouchableOpacity
               style={styles.notifBtn}
-              onPress={() => router.push('/(tabs)/stock' as any)}
+              onPress={() => router.push('/(tabs)/alerts' as any)}
               activeOpacity={0.8}
             >
               <Ionicons name="notifications-outline" size={22} color={colors.text} />
@@ -146,7 +146,14 @@ export default function DashboardScreen() {
           {/* Alertes stock bas */}
           {alertsEnabled && alertProducts.length > 0 && (
             <View style={styles.card}>
-              <Text style={styles.sectionLabel}>Stock bas</Text>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionLabel}>Stock bas</Text>
+                {alertProducts.length > 3 && (
+                  <TouchableOpacity onPress={() => router.push('/(tabs)/alerts' as any)}>
+                    <Text style={styles.sectionLink}>Voir tout ({alertProducts.length}) →</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
               <View style={styles.alertList}>
                 {alertProducts.slice(0, 3).map((product) => (
                   <AlertRow
@@ -154,7 +161,7 @@ export default function DashboardScreen() {
                     name={product.name}
                     current={product.totalStock ?? 0}
                     threshold={product.lowStockThreshold}
-                    onPress={() => router.push(`/(tabs)/products/${product.id}` as any)}
+                    onPress={() => router.push(`/(tabs)/stock/new?productId=${product.id}` as any)}
                   />
                 ))}
               </View>

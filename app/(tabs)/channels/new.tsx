@@ -10,6 +10,7 @@ import { useEtsyOAuth } from '../../../hooks/useEtsyOAuth'
 import { useShopifyOAuth } from '../../../hooks/useShopifyOAuth'
 import { useTheme } from '../../../contexts/ThemeContext'
 import AuroraBackground from '../../../components/AuroraBackground'
+import { ChannelLogo, BRAND_CHANNEL_TYPES } from '../../../components/ChannelLogo'
 import { Spacing, FontSize, Radius, type ColorScheme } from '../../../constants/theme'
 import type { ChannelType } from '../../../types/types'
 
@@ -100,18 +101,22 @@ export default function NewChannelScreen() {
                   style={[styles.typeRow, selectedType === t.type && styles.typeRowActive]}
                   onPress={() => { setSelectedType(t.type); if (!name) setName(t.label) }}
                 >
-                  <View style={[
-                    styles.typeIcon,
-                    t.manual && styles.typeIconManual,
-                    selectedType === t.type && styles.typeIconActive,
-                  ]}>
-                    <Text style={[
-                      styles.typeIconText,
-                      (!t.manual || selectedType === t.type) && styles.typeIconTextWhite,
+                  {BRAND_CHANNEL_TYPES.includes(t.type) ? (
+                    <ChannelLogo type={t.type} size={36} />
+                  ) : (
+                    <View style={[
+                      styles.typeIcon,
+                      t.manual && styles.typeIconManual,
+                      selectedType === t.type && styles.typeIconActive,
                     ]}>
-                      {t.icon}
-                    </Text>
-                  </View>
+                      <Text style={[
+                        styles.typeIconText,
+                        (!t.manual || selectedType === t.type) && styles.typeIconTextWhite,
+                      ]}>
+                        {t.icon}
+                      </Text>
+                    </View>
+                  )}
                   <View style={styles.typeInfo}>
                     <Text style={styles.typeLabel}>{t.label}</Text>
                     <Text style={styles.typeSub}>

@@ -9,11 +9,12 @@ import { useChannelStore } from '../../stores/useChannelStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { supabase } from '../../lib/supabase'
 import AuroraBackground from '../../components/AuroraBackground'
+import { ChannelLogo, BRAND_CHANNEL_TYPES } from '../../components/ChannelLogo'
 import { Spacing, FontSize, Radius, type ColorScheme } from '../../constants/theme'
 import type { Channel } from '../../types/types'
 
 const CHANNEL_ICONS: Record<string, string> = {
-  etsy: 'E', woocommerce: 'W', physical: '◻', market: '⊕', other: '+',
+  physical: '◻', market: '⊕', other: '+',
 }
 
 function timeAgo(dateStr: string): string {
@@ -43,13 +44,19 @@ function ChannelCard({ channel, syncLog, onDelete, colors, styles }: {
   const isConnected = !isManual && !!channel.apiToken
   const hasSyncError = syncLog?.status === 'error'
 
+  const isBrand = BRAND_CHANNEL_TYPES.includes(channel.type as any)
+
   return (
     <View style={styles.card}>
-      <View style={[styles.icon, isManual && styles.iconGray]}>
-        <Text style={[styles.iconText, isManual && styles.iconTextGray]}>
-          {CHANNEL_ICONS[channel.type] ?? '+'}
-        </Text>
-      </View>
+      {isBrand ? (
+        <ChannelLogo type={channel.type as any} size={40} />
+      ) : (
+        <View style={[styles.icon, isManual && styles.iconGray]}>
+          <Text style={[styles.iconText, isManual && styles.iconTextGray]}>
+            {CHANNEL_ICONS[channel.type] ?? '+'}
+          </Text>
+        </View>
+      )}
       <View style={styles.info}>
         <Text style={styles.name}>{channel.name}</Text>
         <View style={styles.statusRow}>

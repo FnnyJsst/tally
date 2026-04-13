@@ -13,6 +13,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="channels" options={{ title: 'Canaux' }} />
       <Tabs.Screen name="stats" options={{ title: 'Stats' }} />
       <Tabs.Screen name="settings" options={{ title: 'Réglages' }} />
+      <Tabs.Screen name="alerts" options={{ href: null }} />
       <Tabs.Screen name="channels/new" options={{ href: null }} />
       <Tabs.Screen name="settings/profile" options={{ href: null }} />
       <Tabs.Screen name="settings/import-csv" options={{ href: null }} />
