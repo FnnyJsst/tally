@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   View, Text, StyleSheet, FlatList,
-  TouchableOpacity, RefreshControl, Alert, SafeAreaView
+  TouchableOpacity, RefreshControl, Alert, SafeAreaView, ActivityIndicator
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -13,8 +13,15 @@ import { ChannelLogo, BRAND_CHANNEL_TYPES } from '../../components/ChannelLogo'
 import { Spacing, FontSize, Radius, type ColorScheme } from '../../constants/theme'
 import type { Channel } from '../../types/types'
 
-const CHANNEL_ICONS: Record<string, string> = {
-  physical: '◻', market: '⊕', other: '+',
+function getManualIcon(channel: Channel): string {
+  if (channel.type === 'physical') return '🏬'
+  if (channel.type === 'market') return '🎪'
+  if (channel.type === 'other') {
+    const firstChar = [...channel.name][0]
+    if (firstChar && firstChar.codePointAt(0)! > 255) return firstChar
+    return '+'
+  }
+  return '+'
 }
 
 function timeAgo(dateStr: string): string {
@@ -33,16 +40,21 @@ type SyncLog = {
   items_synced?: number
 }
 
-function ChannelCard({ channel, syncLog, onDelete, colors, styles }: {
+const SYNCABLE_TYPES = ['woocommerce', 'etsy', 'shopify']
+
+function ChannelCard({ channel, syncLog, onDelete, onSync, isSyncing, colors, styles }: {
   channel: Channel
   syncLog?: SyncLog | null
   onDelete: () => void
+  onSync: () => void
+  isSyncing: boolean
   colors: ColorScheme
   styles: ReturnType<typeof makeStyles>
 }) {
   const isManual = ['physical', 'market', 'other'].includes(channel.type)
   const isConnected = !isManual && !!channel.apiToken
   const hasSyncError = syncLog?.status === 'error'
+  const isSyncable = SYNCABLE_TYPES.includes(channel.type) && isConnected
 
   const isBrand = BRAND_CHANNEL_TYPES.includes(channel.type as any)
 
@@ -52,8 +64,12 @@ function ChannelCard({ channel, syncLog, onDelete, colors, styles }: {
         <ChannelLogo type={channel.type as any} size={40} />
       ) : (
         <View style={[styles.icon, isManual && styles.iconGray]}>
-          <Text style={[styles.iconText, isManual && styles.iconTextGray]}>
-            {CHANNEL_ICONS[channel.type] ?? '+'}
+          <Text style={[
+            styles.iconText,
+            isManual && styles.iconTextGray,
+            getManualIcon(channel).codePointAt(0)! > 255 && styles.iconTextEmoji,
+          ]}>
+            {getManualIcon(channel)}
           </Text>
         </View>
       )}
@@ -80,16 +96,31 @@ function ChannelCard({ channel, syncLog, onDelete, colors, styles }: {
           </Text>
         )}
       </View>
-      <TouchableOpacity onPress={onDelete} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-        <Ionicons name="close-circle-outline" size={20} color={colors.text3} />
-      </TouchableOpacity>
+      <View style={styles.cardActions}>
+        {isSyncable && (
+          <TouchableOpacity
+            onPress={onSync}
+            disabled={isSyncing}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={styles.syncBtn}
+          >
+            {isSyncing
+              ? <ActivityIndicator size="small" color={colors.accent} />
+              : <Ionicons name="sync-outline" size={18} color={colors.accent} />
+            }
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={onDelete} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Ionicons name="close-circle-outline" size={20} color={colors.text3} />
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
 
 export default function ChannelsScreen() {
   const router = useRouter()
-  const { channels, fetchChannels, deleteChannel, isLoading } = useChannelStore()
+  const { channels, fetchChannels, deleteChannel, syncChannel, syncingChannelIds, isLoading } = useChannelStore()
   const { colors, isDark } = useTheme()
   const styles = useMemo(() => makeStyles(colors, isDark), [colors, isDark])
   const [syncLogs, setSyncLogs] = useState<Record<string, SyncLog>>({})
@@ -123,6 +154,12 @@ export default function ChannelsScreen() {
       { text: 'Annuler', style: 'cancel' },
       { text: 'Supprimer', style: 'destructive', onPress: () => deleteChannel(channel.id) }
     ])
+  }
+
+  const handleSync = async (channel: Channel) => {
+    const { error } = await syncChannel(channel)
+    if (error) Alert.alert('Erreur de sync', error)
+    else await loadSyncLogs()
   }
 
   return (
@@ -165,6 +202,8 @@ export default function ChannelsScreen() {
                 channel={item}
                 syncLog={syncLogs[item.id] ?? null}
                 onDelete={() => handleDelete(item)}
+                onSync={() => handleSync(item)}
+                isSyncing={syncingChannelIds.includes(item.id)}
                 colors={colors}
                 styles={styles}
               />
@@ -209,6 +248,9 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
     },
     iconText: { color: '#FFF', fontSize: FontSize.base, fontWeight: '500' },
     iconTextGray: { color: colors.text2 },
+    iconTextEmoji: { fontSize: 22 },
+    cardActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+    syncBtn: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
     info: { flex: 1, gap: 2 },
     name: { fontSize: FontSize.base, fontWeight: '500', color: colors.text },
     statusRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },

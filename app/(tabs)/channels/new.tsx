@@ -15,12 +15,12 @@ import { Spacing, FontSize, Radius, type ColorScheme } from '../../../constants/
 import type { ChannelType } from '../../../types/types'
 
 const CHANNEL_TYPES: { type: ChannelType; label: string; icon: string; manual: boolean }[] = [
-  { type: 'etsy',        label: 'Etsy',             icon: 'E', manual: false },
-  { type: 'shopify',     label: 'Shopify',          icon: 'S', manual: false },
-  { type: 'woocommerce', label: 'WooCommerce',       icon: 'W', manual: false },
-  { type: 'physical',    label: 'Boutique physique', icon: '◻', manual: true },
-  { type: 'market',      label: 'Marché / Salon',    icon: '⊕', manual: true },
-  { type: 'other',       label: 'Autre',             icon: '+', manual: true },
+  { type: 'etsy',        label: 'Etsy',             icon: 'E',  manual: false },
+  { type: 'shopify',     label: 'Shopify',          icon: 'S',  manual: false },
+  { type: 'woocommerce', label: 'WooCommerce',       icon: 'W',  manual: false },
+  { type: 'physical',    label: 'Boutique physique', icon: '🏬', manual: true },
+  { type: 'market',      label: 'Marché / Salon',    icon: '🎪', manual: true },
+  { type: 'other',       label: 'Autre',             icon: '+',  manual: true },
 ]
 
 export default function NewChannelScreen() {
@@ -34,6 +34,7 @@ export default function NewChannelScreen() {
 
   const [selectedType, setSelectedType] = useState<ChannelType | null>(null)
   const [name, setName] = useState('')
+  const [customEmoji, setCustomEmoji] = useState('')
   const [apiToken, setApiToken] = useState('')
   const [siteUrl, setSiteUrl] = useState('')
   const [shopifyDomain, setShopifyDomain] = useState('')
@@ -61,9 +62,12 @@ export default function NewChannelScreen() {
       return
     }
 
+    const emoji = customEmoji.trim()
+    const finalName = selectedType === 'other' && emoji ? `${emoji} ${name.trim()}` : name.trim()
+
     setIsLoading(true)
     const { error } = await createChannel({
-      user_id: user?.id, name: name.trim(), type: selectedType,
+      user_id: user?.id, name: finalName, type: selectedType,
       api_token: apiToken.trim() || undefined,
       site_url: selectedType === 'woocommerce' ? siteUrl.trim() : undefined,
       is_active: true,
@@ -107,13 +111,15 @@ export default function NewChannelScreen() {
                     <View style={[
                       styles.typeIcon,
                       t.manual && styles.typeIconManual,
-                      selectedType === t.type && styles.typeIconActive,
+                      selectedType === t.type && t.type !== 'physical' && t.type !== 'market' && styles.typeIconActive,
                     ]}>
                       <Text style={[
                         styles.typeIconText,
-                        (!t.manual || selectedType === t.type) && styles.typeIconTextWhite,
+                        t.icon.codePointAt(0)! > 255 ? styles.typeIconEmoji : (
+                          (!t.manual || selectedType === t.type) && styles.typeIconTextWhite
+                        ),
                       ]}>
-                        {t.icon}
+                        {t.type === 'other' && selectedType === t.type && customEmoji ? customEmoji : t.icon}
                       </Text>
                     </View>
                   )}
@@ -169,6 +175,21 @@ export default function NewChannelScreen() {
 
           {selectedType && selectedType !== 'etsy' && selectedType !== 'shopify' && (
             <>
+              {selectedType === 'other' && (
+                <>
+                  <Text style={styles.sectionLabel}>Icône (emoji)</Text>
+                  <View style={[styles.card, { alignSelf: 'flex-start' }]}>
+                    <TextInput
+                      style={styles.emojiInput}
+                      value={customEmoji}
+                      onChangeText={setCustomEmoji}
+                      placeholder="🎨"
+                      placeholderTextColor={colors.text3}
+                      maxLength={8}
+                    />
+                  </View>
+                </>
+              )}
               <Text style={styles.sectionLabel}>Nom</Text>
               <View style={styles.card}>
                 <TextInput
@@ -254,6 +275,11 @@ function makeStyles(colors: ColorScheme, isDark: boolean) {
     typeIconActive: { backgroundColor: colors.accent },
     typeIconText: { fontSize: FontSize.sm, fontWeight: '500', color: colors.text2 },
     typeIconTextWhite: { color: 'white' },
+    typeIconEmoji: { fontSize: 20 },
+    emojiInput: {
+      fontSize: 26, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+      textAlign: 'center', minWidth: 64, color: colors.text,
+    },
     typeInfo: { flex: 1 },
     typeLabel: { fontSize: FontSize.base, fontWeight: '500', color: colors.text },
     typeSub: { fontSize: FontSize.xs, color: colors.text3, marginTop: 1 },

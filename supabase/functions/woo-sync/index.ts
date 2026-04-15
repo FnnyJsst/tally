@@ -35,17 +35,26 @@ async function fetchWooOrders(
 }
 
 // ─── Handler principal ─────────────────────────────────────
-Deno.serve(async () => {
+Deno.serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
-    // Récupère tous les canaux WooCommerce actifs
-    const { data: channels, error: channelsError } = await supabase
+    // channelId optionnel : si fourni, sync uniquement ce canal (trigger manuel)
+    const body = await req.json().catch(() => ({}))
+    const specificChannelId: string | undefined = body?.channelId
+
+    let query = supabase
       .from('channels')
       .select('id, user_id, name, api_token, site_url, last_synced_at')
       .eq('type', 'woocommerce')
       .eq('is_active', true)
       .not('api_token', 'is', null)
+
+    if (specificChannelId) {
+      query = query.eq('id', specificChannelId)
+    }
+
+    const { data: channels, error: channelsError } = await query
 
     if (channelsError) throw channelsError
     if (!channels || channels.length === 0) {
